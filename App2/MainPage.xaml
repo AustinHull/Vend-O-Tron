@@ -1,0 +1,30 @@
+﻿<Page
+    x:Class="App2.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:App2"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:bm="using:Bing.Maps"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+        <bm:Map ZoomLevel="17.0" Credentials="1p1uIfk9kPrFAvhJdTpd~n4ZjugQgZv4oqgHdZQqEMw~AgbIE-tXqeWDzZDW9t5BFiNR1nPhZctqN3wq0aPCfaY7d57Ub_6eoqiPWxUOvyvP"
+            x:Name="VendFinderApp">
+            <bm:Map.Center>
+                <bm:Location Latitude="39.956067" Longitude="-75.191588"/>
+            </bm:Map.Center>
+
+          <bm:Map.Children>
+            <bm:Pushpin>
+              <bm:MapLayer.Position>
+                <bm:Location Latitude="39.610039" Longitude="-75.342207" />
+              </bm:MapLayer.Position>
+            </bm:Pushpin>
+          </bm:Map.Children>
+
+        </bm:Map>
+
+    </Grid>
+</Page>
