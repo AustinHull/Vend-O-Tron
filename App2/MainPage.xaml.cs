@@ -16,6 +16,9 @@ using Windows.UI.Input;
 using Windows.Devices.Input;
 using Windows.UI.Core;
 using System.Diagnostics;
+using C = System.Data.Common;
+using Windows.Storage;
+using System.Threading.Tasks;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -27,22 +30,32 @@ namespace App2
 
     public sealed partial class MainPage : Page
     {
-        Windows.Foundation.Point mousePos;
-        PointerPoint mousePoint;
-        CoreCursor cursor;
-        CoreCursorType cType = CoreCursorType.Arrow;
-        
-        
+        Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
+
+        string universalText;
+
         public MainPage()
         {
             this.InitializeComponent();
+            Debug.WriteLine(Windows.Storage.ApplicationData.Current.LocalFolder.Path);
+            //storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
+
+            Task tempFile;
+
+            tempFile = loadFile("dataBase.txt");
+
+
+            //C.DbConnection dataBase;
+
+
+            //dataBase.ConnectionString = "Server=tcp:YOUR_SERVER_NAME_HERE.database.windows.net,1433;Database=AdventureWorksLT;User ID=";
 
             this.VendFinderApp.PointerPressedOverride += VendFinderApp_PointerPressedOverride;
 
             //programLoop();
         }
 
-        void VendFinderApp_PointerPressedOverride(object sender, PointerRoutedEventArgs e)
+        async void VendFinderApp_PointerPressedOverride(object sender, PointerRoutedEventArgs e)
         {
             Bing.Maps.Location loc = new Bing.Maps.Location();
             this.VendFinderApp.TryPixelToLocation(e.GetCurrentPoint(this.VendFinderApp).Position, out loc);
@@ -50,15 +63,29 @@ namespace App2
             pushPin.SetValue(Bing.Maps.MapLayer.PositionProperty, loc);
             this.VendFinderApp.Children.Add(pushPin);
 
+
+
             // Add code to prompt user to enter VendMachine metadata...
             TextBox inputPrompt = new TextBox();
-            inputPrompt.Height = (1/4) * Height;
+            inputPrompt.Height = (1 / 4) * Height;
             inputPrompt.Width = Width;
-            inputPrompt.Text = "Enter location of Vending Machine...";
+            inputPrompt.SetValue(Bing.Maps.MapLayer.PositionProperty, loc);
+            inputPrompt.PlaceholderText = "Enter location of Vending Machine...";
+            inputPrompt.IsEnabled = true;
             inputPrompt.UpdateLayout();
             inputPrompt.Opacity = 100;
             inputPrompt.Visibility = Visibility.Visible;
             VendFinderApp.Children.Add(inputPrompt);
+
+            string name = "database.txt";
+
+            Windows.Storage.StorageFile storeFile =
+                await storageFolder.CreateFileAsync("dataBase.txt", CreationCollisionOption.GenerateUniqueName);
+
+            storeFile = await storageFolder.GetFileAsync("dataBase.txt");
+            await Windows.Storage.FileIO.WriteTextAsync(storeFile, loc.Latitude.ToString() + " " + loc.Longitude.ToString());
+
+
         }
 
         public void programLoop()
@@ -67,10 +94,28 @@ namespace App2
             {
                 
 
+
                 Debug.WriteLine("Hello");
                 //UInt32 pointerLoc = 0;
                 //PointerPoint.GetCurrentPoint(pointerLoc);
             }
+        }
+
+        public async Task<StorageFile> loadFile(string fileName)
+        {
+            Windows.Storage.StorageFile loadFile = await storageFolder.GetFileAsync(fileName);
+
+            universalText = await Windows.Storage.FileIO.ReadTextAsync(loadFile);
+
+            double lat = double.Parse(universalText.Substring(0, 16));
+            double longi = double.Parse(universalText.Substring(17));
+            Bing.Maps.Location loc = new Bing.Maps.Location(lat, longi);
+
+            Bing.Maps.Pushpin pushPin = new Bing.Maps.Pushpin();
+            pushPin.SetValue(Bing.Maps.MapLayer.PositionProperty, loc);
+            this.VendFinderApp.Children.Add(pushPin);
+
+            return loadFile;
         }
     }
 }
