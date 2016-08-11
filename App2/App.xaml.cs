@@ -18,6 +18,7 @@ using Windows.Graphics;
 using Windows.UI.Xaml.Controls.Maps;
 using Bing.Maps;
 using Windows.UI.Input;
+using Microsoft.EntityFrameworkCore;
 
 namespace App2
 {

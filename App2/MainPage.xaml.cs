@@ -20,7 +20,7 @@ using System.Data.Common;
 using Windows.Storage;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
-using Microsoft.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 

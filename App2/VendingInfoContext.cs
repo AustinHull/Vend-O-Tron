@@ -13,7 +13,7 @@ namespace App2
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-
+            optionsBuilder.UseSqlite("Filename=InfoDatabase.db");
         }
     }
 }
