@@ -15,8 +15,10 @@ using Windows.UI.Xaml.Navigation;
 using Windows.UI.Input;
 using Windows.Devices.Input;
 using Windows.UI.Core;
+using Windows.System;
 using System.Diagnostics;
 using System.Data.Common;
+using System.Windows.Input;
 using Windows.Storage;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
@@ -32,9 +34,14 @@ namespace App2
 
     public sealed partial class MainPage : Page
     {
-        Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
-
+        // Used to tell if a pin has been placed, but has not yet been submitted.
+        bool pinBeingPlaced;
         string universalText;
+        string mLoc; // This data will be set when the pin is first placed.
+
+        TextBox inputPrompt; // While TextBox is active, have access to present data.
+
+        Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
 
         public MainPage()
         {
@@ -46,9 +53,39 @@ namespace App2
 
             tempFile = loadFile("dataBase.txt");
 
+            // Checks for click/tap input - used to place pins on the map.
             this.VendFinderApp.PointerPressedOverride += VendFinderApp_PointerPressedOverride;
 
+            // Checks for Enter key input after recent pin placement - used to save
+            // pin's vending machine data to an SQLite database.
+            this.VendFinderApp.KeyDown += Enter_KeyDown;
+
             //programLoop();
+        }
+
+        void Enter_KeyDown(object semder, KeyRoutedEventArgs e)
+        {
+            // Fix key recognition!
+            if (e.Key == VirtualKey.Enter && pinBeingPlaced)
+            {
+                // Try putting some SQLite stuff here...
+                using (var dataBase = new VendingInfoContext())
+                {
+                    var machine = new Machine
+                    {
+                        machineName = inputPrompt.Text,
+                        machineLocation = mLoc
+                    };
+
+                    dataBase.Machine.Add(machine);
+
+                    dataBase.SaveChanges();
+
+                    Debug.WriteLine(machine.machineID + ":" + machine.machineName + ":" + machine.machineLocation);
+                }
+
+                pinBeingPlaced = false;
+            }
         }
 
         async void VendFinderApp_PointerPressedOverride(object sender, PointerRoutedEventArgs e)
@@ -62,7 +99,7 @@ namespace App2
 
 
             // Add code to prompt user to enter VendMachine metadata...
-            TextBox inputPrompt = new TextBox();
+            inputPrompt = new TextBox();
             inputPrompt.Height = (1 / 4) * Height;
             inputPrompt.Width = Width;
             inputPrompt.SetValue(Bing.Maps.MapLayer.PositionProperty, loc);
@@ -80,13 +117,12 @@ namespace App2
             Windows.Storage.StorageFile storeFile =
                 await storageFolder.CreateFileAsync(name, CreationCollisionOption.GenerateUniqueName);
 
-            // Try putting some SQLite stuff here...
-
+            mLoc = loc.Latitude.ToString() + "|" + loc.Longitude.ToString();
 
             storeFile = await storageFolder.GetFileAsync("dataBase.txt");
             await Windows.Storage.FileIO.WriteTextAsync(storeFile, loc.Latitude.ToString() + " " + loc.Longitude.ToString());
 
-
+            pinBeingPlaced = true;
         }
 
         public void programLoop()
@@ -94,8 +130,6 @@ namespace App2
             while (true)
             {
                 Debug.WriteLine("Hello");
-                //UInt32 pointerLoc = 0;
-                //PointerPoint.GetCurrentPoint(pointerLoc);
             }
         }
 

@@ -39,6 +39,10 @@ namespace App2
             this.InitializeComponent();
             this.Suspending += OnSuspending;
 
+            using (var dataBase = new VendingInfoContext())
+            {
+                dataBase.Database.Migrate();
+            }
             
 
         }
