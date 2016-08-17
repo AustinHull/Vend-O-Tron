@@ -17,16 +17,16 @@ namespace App2.Migrations
 
             modelBuilder.Entity("App2.Machine", b =>
                 {
-                    b.Property<int>("machineID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("machineLocation");
 
                     b.Property<string>("machineName");
 
-                    b.HasKey("machineID");
+                    b.HasKey("Id");
 
-                    b.ToTable("Machine");
+                    b.ToTable("Machines");
                 });
         }
     }

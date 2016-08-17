@@ -9,7 +9,7 @@ namespace App2
 {
     public class Machine
     {
-        public int machineID { get; set; }
+        public int Id { get; set; }
         public string machineName { get; set; }
         public string machineLocation { get; set; }
     }

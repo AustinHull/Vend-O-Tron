@@ -9,7 +9,7 @@ namespace App2
 {
     public class VendingInfoContext: DbContext
     {
-        public DbSet<Machine> Machine { get; set; }
+        public DbSet<Machine> Machines { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

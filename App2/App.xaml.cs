@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Controls.Maps;
 using Bing.Maps;
 using Windows.UI.Input;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace App2
 {
@@ -38,11 +39,6 @@ namespace App2
                 Microsoft.ApplicationInsights.WindowsCollectors.Session);
             this.InitializeComponent();
             this.Suspending += OnSuspending;
-
-            using (var dataBase = new VendingInfoContext())
-            {
-                dataBase.Database.Migrate();
-            }
             
 
         }
@@ -89,6 +85,12 @@ namespace App2
                 // parameter
                 rootFrame.Navigate(typeof(MainPage), e.Arguments);
             }
+
+            using (var dataBase = new VendingInfoContext())
+            {
+                dataBase.Database.Migrate();
+            }
+
             // Ensure the current window is active
             Window.Current.Activate();
         }

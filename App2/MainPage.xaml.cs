@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Networking.BackgroundTransfer;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -41,17 +42,16 @@ namespace App2
 
         TextBox inputPrompt; // While TextBox is active, have access to present data.
 
-        Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
+        Windows.Storage.StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
 
         public MainPage()
         {
             this.InitializeComponent();
-            Debug.WriteLine(Windows.Storage.ApplicationData.Current.LocalFolder.Path);
+          
+            Debug.WriteLine(ApplicationData.Current.LocalFolder.Path);
             //storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
 
-            Task tempFile;
-
-            tempFile = loadFile("dataBase.txt");
+            loadData();
 
             // Checks for click/tap input - used to place pins on the map.
             this.VendFinderApp.PointerPressedOverride += VendFinderApp_PointerPressedOverride;
@@ -59,13 +59,17 @@ namespace App2
             // Checks for Enter key input after recent pin placement - used to save
             // pin's vending machine data to an SQLite database.
             this.VendFinderApp.KeyDown += Enter_KeyDown;
+        }
 
-            //programLoop();
+        void Download_File()
+        {
+            var downloader = new BackgroundDownloader();
+
+
         }
 
         void Enter_KeyDown(object semder, KeyRoutedEventArgs e)
         {
-            // Fix key recognition!
             if (e.Key == VirtualKey.Enter && pinBeingPlaced)
             {
                 // Try putting some SQLite stuff here...
@@ -77,18 +81,18 @@ namespace App2
                         machineLocation = mLoc
                     };
 
-                    dataBase.Machine.Add(machine);
+                    dataBase.Machines.Add(machine);
 
                     dataBase.SaveChanges();
 
-                    Debug.WriteLine(machine.machineID + ":" + machine.machineName + ":" + machine.machineLocation);
+                    Debug.WriteLine(machine.Id + ":" + machine.machineName + ":" + machine.machineLocation);
                 }
 
                 pinBeingPlaced = false;
             }
         }
 
-        async void VendFinderApp_PointerPressedOverride(object sender, PointerRoutedEventArgs e)
+        void VendFinderApp_PointerPressedOverride(object sender, PointerRoutedEventArgs e)
         {
             Bing.Maps.Location loc = new Bing.Maps.Location();
             this.VendFinderApp.TryPixelToLocation(e.GetCurrentPoint(this.VendFinderApp).Position, out loc);
@@ -111,44 +115,46 @@ namespace App2
             VendFinderApp.Children.Add(inputPrompt);
 
             // Generic file name for file which stores user-prescribed location info.
-            string name = "database.txt";
+            //string name = "database.txt";
 
             // Package the info file and save it to the user's system.
-            Windows.Storage.StorageFile storeFile =
-                await storageFolder.CreateFileAsync(name, CreationCollisionOption.GenerateUniqueName);
+            //StorageFile storeFile =
+              //  await storageFolder.CreateFileAsync(name, CreationCollisionOption.GenerateUniqueName);
 
             mLoc = loc.Latitude.ToString() + "|" + loc.Longitude.ToString();
 
-            storeFile = await storageFolder.GetFileAsync("dataBase.txt");
-            await Windows.Storage.FileIO.WriteTextAsync(storeFile, loc.Latitude.ToString() + " " + loc.Longitude.ToString());
+            //storeFile = await storageFolder.GetFileAsync("dataBase.txt");
+            //await FileIO.WriteTextAsync(storeFile, loc.Latitude.ToString() + " " + loc.Longitude.ToString());
 
             pinBeingPlaced = true;
         }
 
-        public void programLoop()
+        // This is the task which runs to load database information to the app.
+        public void loadData()
         {
-            while (true)
+            using (var queryContext = new VendingInfoContext())
             {
-                Debug.WriteLine("Hello");
+                try
+                {
+                    // Finish implementing database query system!
+                    var machineEntities = queryContext.Machines.ToList();
+                    // Not sure if this actually helps with anything...
+                    Debug.WriteLine(machineEntities[0].Id);
+                }
+                catch(Exception e)
+                {
+                    // Thrown if an exception occurs.
+                    Debug.WriteLine("No elements in database at this time...: " + e);
+                }
             }
-        }
 
-        // This is the task which runs to save a specified file to the user system.
-        public async Task<StorageFile> loadFile(string fileName)
-        {
-            Windows.Storage.StorageFile loadFile = await storageFolder.GetFileAsync(fileName);
+                //double lat = double.Parse(universalText.Substring(0, 16));
+                //double longi = double.Parse(universalText.Substring(17));
+                //Bing.Maps.Location loc = new Bing.Maps.Location(lat, longi);
 
-            universalText = await Windows.Storage.FileIO.ReadTextAsync(loadFile);
-
-            double lat = double.Parse(universalText.Substring(0, 16));
-            double longi = double.Parse(universalText.Substring(17));
-            Bing.Maps.Location loc = new Bing.Maps.Location(lat, longi);
-
-            Bing.Maps.Pushpin pushPin = new Bing.Maps.Pushpin();
-            pushPin.SetValue(Bing.Maps.MapLayer.PositionProperty, loc);
-            this.VendFinderApp.Children.Add(pushPin);
-
-            return loadFile;
+            //Bing.Maps.Pushpin pushPin = new Bing.Maps.Pushpin();
+            //pushPin.SetValue(Bing.Maps.MapLayer.PositionProperty, loc);
+            //this.VendFinderApp.Children.Add(pushPin);
         }
     }
 }

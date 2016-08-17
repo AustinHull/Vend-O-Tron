@@ -105,9 +105,9 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\20160811172937_Database1.cs" />
-    <Compile Include="Migrations\20160811172937_Database1.designer.cs">
-      <DependentUpon>20160811172937_Database1.cs</DependentUpon>
+    <Compile Include="Migrations\20160817040738_Database.cs" />
+    <Compile Include="Migrations\20160817040738_Database.designer.cs">
+      <DependentUpon>20160817040738_Database.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\VendingInfoContextModelSnapshot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
