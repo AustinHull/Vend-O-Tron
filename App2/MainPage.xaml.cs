@@ -132,12 +132,29 @@ namespace App2
         // This is the task which runs to load database information to the app.
         public void loadData()
         {
+            List<string> machineNames = new List<string>();
+            List<double> machineCoordLat = new List<double>();
+            List<double> machineCoordLong = new List<double>();
+
             using (var queryContext = new VendingInfoContext())
             {
                 try
                 {
                     // Finish implementing database query system!
                     var machineEntities = queryContext.Machines.ToList();
+
+                    // Organizes pin data from SQLite database into compartmentalized variables
+                    // for use within the application.
+                    for (int i = 0; i < machineEntities.Count(); i++)
+                    {
+                        machineNames.Add(machineEntities.ElementAt(i).machineName);
+
+                        double tempLat = double.Parse(machineEntities.ElementAt(i).machineLocation.Substring(0, 16));
+                        double tempLong = double.Parse(machineEntities.ElementAt(i).machineLocation.Substring(17));
+                        machineCoordLat.Add(tempLat);
+                        machineCoordLong.Add(tempLong);
+                    }
+
                     // Not sure if this actually helps with anything...
                     Debug.WriteLine(machineEntities[0].Id);
                 }
@@ -148,9 +165,19 @@ namespace App2
                 }
             }
 
-                //double lat = double.Parse(universalText.Substring(0, 16));
-                //double longi = double.Parse(universalText.Substring(17));
-                //Bing.Maps.Location loc = new Bing.Maps.Location(lat, longi);
+            // Places all stored location pins onto the application's map.
+            for (int i = 0; i < machineNames.Count(); i++)
+            {
+                Bing.Maps.Location loc = new Bing.Maps.Location(machineCoordLat.ElementAt(i), machineCoordLong.ElementAt(i));
+
+                Bing.Maps.Pushpin pushPin = new Bing.Maps.Pushpin();
+                pushPin.SetValue(Bing.Maps.MapLayer.PositionProperty, loc);
+                this.VendFinderApp.Children.Add(pushPin);
+            }
+
+            //double lat = double.Parse(universalText.Substring(0, 16));
+            //double longi = double.Parse(universalText.Substring(17));
+            //Bing.Maps.Location loc = new Bing.Maps.Location(lat, longi);
 
             //Bing.Maps.Pushpin pushPin = new Bing.Maps.Pushpin();
             //pushPin.SetValue(Bing.Maps.MapLayer.PositionProperty, loc);
