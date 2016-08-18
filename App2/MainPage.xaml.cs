@@ -173,6 +173,18 @@ namespace App2
                 Bing.Maps.Pushpin pushPin = new Bing.Maps.Pushpin();
                 pushPin.SetValue(Bing.Maps.MapLayer.PositionProperty, loc);
                 this.VendFinderApp.Children.Add(pushPin);
+
+                // Add textbox containing location name to placed pin location...
+                TextBox locText = new TextBox();
+                locText.Height = (1 / 4) * Height;
+                locText.Width = Width;
+                locText.SetValue(Bing.Maps.MapLayer.PositionProperty, loc);
+                locText.Text = machineNames.ElementAt(i);
+                locText.IsEnabled = true;
+                locText.UpdateLayout();
+                locText.Opacity = 100;
+                locText.Visibility = Visibility.Visible;
+                VendFinderApp.Children.Add(locText);
             }
 
             //double lat = double.Parse(universalText.Substring(0, 16));
