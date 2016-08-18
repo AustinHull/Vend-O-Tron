@@ -88,6 +88,9 @@ namespace App2
                     Debug.WriteLine(machine.Id + ":" + machine.machineName + ":" + machine.machineLocation);
                 }
 
+                // Now that the user has confirmed their data entry, disable the edit
+                // mode of the textbox, and reset the pinBeingPlaced variable to false.
+                inputPrompt.IsReadOnly = true;
                 pinBeingPlaced = false;
             }
         }
@@ -110,7 +113,7 @@ namespace App2
             inputPrompt.PlaceholderText = "Enter location of Vending Machine...";
             inputPrompt.IsEnabled = true;
             inputPrompt.UpdateLayout();
-            inputPrompt.Opacity = 100;
+            inputPrompt.Opacity = 1;
             inputPrompt.Visibility = Visibility.Visible;
             VendFinderApp.Children.Add(inputPrompt);
 
@@ -182,8 +185,9 @@ namespace App2
                 locText.Text = machineNames.ElementAt(i);
                 locText.IsEnabled = true;
                 locText.UpdateLayout();
-                locText.Opacity = 100;
+                locText.Opacity = 1;
                 locText.Visibility = Visibility.Visible;
+                locText.IsReadOnly = true;
                 VendFinderApp.Children.Add(locText);
             }
 
